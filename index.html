@@ -5,13 +5,26 @@
     <meta name="viewport" content="width=device-width">
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.24.0/d3-legend.min.js"></script>
-    <title>Visualization Project</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <title>TMDB Keywords</title>
     <link rel="stylesheet" href="css/styles.css">
   </head>
   <body>
     <div id="visualization">
-      <svg></svg>
+      <div class="left">
+        <div class="title"><h1>Most Common Plot Keywords</h1></div>
+        <div class="wordcloud" id="wordcloud">
+          <svg width="500" height="500"></svg>
+        </div>
+      </div>
+      <div class="right">
+        <div class="filters"><h2>Filters</h2></div>
+        <div class="line" id="line">
+          <svg width="500" height="300"></svg>
+        </div>
+      </div>
     </div>
+
     <script src="./dist/bundle.js"></script>
   </body>
 </html>

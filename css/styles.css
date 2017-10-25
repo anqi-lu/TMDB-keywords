@@ -26,3 +26,16 @@ body {
   top: 0px;
   bottom: 0px;
 }
+
+/* my stuff */
+.left {
+  float: left;
+}
+.right {
+  float: left;
+}
+
+
+.line svg {
+  background-color: black;
+}
