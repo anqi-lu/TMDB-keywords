@@ -171,7 +171,7 @@ d3.json('data/keywords.json', data => {
   render();
 
   // Redraw based on the new size whenever the browser window is resized.
-  window.addEventListener('resize', render);
+  //window.addEventListener('resize', render);
 });
 
 /***/ }),
