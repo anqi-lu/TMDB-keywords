@@ -100,7 +100,7 @@ export default function (svg_location, props){
           .text(function (d) {
             return d.key;
           })
-          .font('impact')
+          .font('Impact')
           .spiral('archimedean')
           .stop()
           .words(attrs.data.values)

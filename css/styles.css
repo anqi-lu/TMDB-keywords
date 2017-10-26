@@ -13,7 +13,7 @@ body {
 }
 .tick text, .legendCells text {
   fill: #8E8883;
-  font-size: 28pt;
+  font-size: 15pt;
   font-family: sans-serif;
 }
 .axis-label, .legend-label {
@@ -47,10 +47,6 @@ body {
   height: 100px;
 }
 
-.line svg {
-  background-color: black;
-}
-
 .left {
   width: 40%;
   margin-left: 100px;
@@ -60,3 +56,4 @@ body {
   margin-left: 0;
   float: left;
 }
+

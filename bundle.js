@@ -71,9 +71,11 @@
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__scatterPlot__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__wordcloud__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__line__ = __webpack_require__(4);
 
 
 
+/*
 const xValue = d => d.sepalLength;
 const xLabel = 'Sepal Length';
 const yValue = d => d.petalLength;
@@ -104,7 +106,7 @@ d3.csv('data/iris.csv', row, data => {
       .attr('height', lineDiv.clientHeight);
 
     // Render the scatter plot.
-    Object(__WEBPACK_IMPORTED_MODULE_0__scatterPlot__["a" /* default */])(svgLine, {
+    scatterPlot(svgLine, {
       data,
       xValue,
       xLabel,
@@ -122,6 +124,7 @@ d3.csv('data/iris.csv', row, data => {
   // Redraw based on the new size whenever the browser window is resized.
   window.addEventListener('resize', render);
 });
+*/
 
 /* Drawing wordcloud */
 const wordcloud = d3.select('#wordcloud');
@@ -129,6 +132,47 @@ const wordcloudDiv = wordcloud.node();
 const svgWordcloud = wordcloud.select('svg');
 
 Object(__WEBPACK_IMPORTED_MODULE_1__wordcloud__["a" /* default */])(svgWordcloud);
+
+/* Drawing linechart */
+
+const keyword = "love";
+const margin = { left: 50, right: 20, top: 20, bottom: 50 };
+
+const lineId = d3.select('#line');
+const lineDiv = lineId.node();
+const svgLine = lineId.select('svg');
+
+d3.json('data/keywords.json', data => {
+
+  var years = [];
+  var obj = data[keyword];
+  for (var year in obj.years) {
+    years.push({
+      year: year,
+      freq: obj['years'][year]  
+    });
+  }
+
+  const render = () => {
+
+    // Extract the width and height that was computed by CSS.
+    svgLine
+      .attr('width', lineDiv.clientWidth)
+      .attr('height', lineDiv.clientHeight);
+
+    // Render the scatter plot.
+    Object(__WEBPACK_IMPORTED_MODULE_2__line__["a" /* default */])(svgLine, {
+      years,
+      margin
+    });
+  }
+
+  // Draw for the first time to initialize.
+  render();
+
+  // Redraw based on the new size whenever the browser window is resized.
+  window.addEventListener('resize', render);
+});
 
 /***/ }),
 /* 1 */
@@ -153,7 +197,7 @@ const colorLegend = d3.legendColor()
   .scale(colorScale)
   .shape('circle');
 
-/* harmony default export */ __webpack_exports__["a"] = (function (svg, props) {
+/* unused harmony default export */ var _unused_webpack_default_export = (function (svg, props) {
   const { 
     data,
     xValue,
@@ -356,7 +400,7 @@ const colorLegend = d3.legendColor()
           .text(function (d) {
             return d.key;
           })
-          .font('impact')
+          .font('Impact')
           .spiral('archimedean')
           .stop()
           .words(attrs.data.values)
@@ -973,6 +1017,73 @@ const colorLegend = d3.legendColor()
   if (typeof module === "object" && module.exports) module.exports = cloud;
   else (d3.layout || (d3.layout = {})).cloud = cloud;
 })();
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+/* harmony default export */ __webpack_exports__["a"] = (function (svg_location, props) {
+    console.log('in line!');
+    const { 
+        years,
+        xValue,
+        xLabel,
+        yValue,
+        yLabel,
+        margin
+      } = props;
+
+    const data = years;
+    const  svg = d3.select("#lineSVG");
+    const width = svg.attr('width');
+    const height = svg.attr('height');
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+    const x = d3.scaleLinear()
+    .rangeRound([0, width]);
+    const y = d3.scaleLinear()
+    .rangeRound([innerHeight, 0]);
+    var line = d3.line()
+    .x(function(d) { return x(d.year); })
+    .y(function(d) { return y(d.freq); });
+    
+    
+    const g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    renderChart(data);
+
+    function renderChart(data) {
+        x.domain(d3.extent(data, function(d) { return d.year; }));
+        y.domain(d3.extent(data, function(d) { return d.freq; }));
+      
+        g.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x))
+          .select(".domain")
+            .remove();
+      
+        g.append("g")
+            .call(d3.axisLeft(y))
+          .append("text")
+            .attr("fill", "#000")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", "0.71em")
+            .attr("text-anchor", "end")
+            .text("Frequency");
+      
+        g.append("path")
+            .datum(data)
+            .attr("fill", "none")
+            .attr("stroke", "steelblue")
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-linecap", "round")
+            .attr("stroke-width", 1.5)
+            .attr("d", line);
+    }
+});
 
 /***/ })
 /******/ ]);
