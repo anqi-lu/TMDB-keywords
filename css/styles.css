@@ -1,5 +1,9 @@
+html {
+  font-family: 'Lato', sans-serif;
+}
 body {
   margin: 0px;
+  font-family: 'Lato', sans-serif;
 }
 .domain {
   display: none;
@@ -35,7 +39,24 @@ body {
   float: left;
 }
 
+.title {
+  height: 100px;
+}
+
+.filters {
+  height: 100px;
+}
 
 .line svg {
   background-color: black;
+}
+
+.left {
+  width: 40%;
+  margin-left: 100px;
+  margin-right: 100px;
+}
+.wordcloud svg {
+  margin-left: 0;
+  float: left;
 }
