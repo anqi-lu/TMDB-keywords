@@ -75,104 +75,134 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-/*
-const xValue = d => d.sepalLength;
-const xLabel = 'Sepal Length';
-const yValue = d => d.petalLength;
-const yLabel = 'Petal Length';
-const colorValue = d => d.species;
-const colorLabel = 'Species';
-const margin = { left: 120, right: 300, top: 20, bottom: 120 };
 
-const line = d3.select('#line');
-const lineDiv = line.node();
-const svgLine = line.select('svg');
 
-const row = d => {
-  d.petalLength = +d.petalLength;
-  d.petalWidth = +d.petalWidth;
-  d.sepalLength = +d.sepalLength;
-  d.sepalWidth = +d.sepalWidth;
-  return d;
-};
+d3.json('data/keywords.json', _keywords => {
+d3.json('data/genres.json', _genres => {
 
-d3.csv('data/iris.csv', row, data => {
+  /**
+   * Fetches the *correct* data given a genre.
+   * @param {str} genre - subset of data to fetch.
+   */
+  const getData = (genre) => {
+    var word_count = []; 
+    if (genre == "all") {
+      for (var word in _keywords) {
+        word_count.push({
+          key: word,
+          value: _keywords[word]['total_count']
+        });
+      }
+      return {
+        keywords: _keywords,
+        word_count: word_count
+      }
+    }
+    const data = _genres[genre];    
+    const keywords = data['keywords'];
+    for (var word in keywords) {
+      word_count.push({
+        key: word,
+        value: keywords[word]['count']
+      });
+    }
+    return {
+      keywords: keywords,
+      word_count: word_count
+    }
+  }
 
-  const render = () => {
+  /* Drawing wordcloud */
+  const wordcloud = d3.select('#wordcloud');
+  const wordcloudDiv = wordcloud.node();
+  const svgWordcloud = wordcloud.select('svg');
+
+  /* Drawing linechart */
+  const selectedWords = ["love"];
+  const margin = { left: 50, right: 20, top: 20, bottom: 50 };
+  const lineId = d3.select('#line');
+  const lineDiv = lineId.node();
+  const svgLine = lineId.select('svg');
+
+  /* Render function */
+  const render = (_data) => {
+    const {keywords, word_count} = _data;
 
     // Extract the width and height that was computed by CSS.
     svgLine
       .attr('width', lineDiv.clientWidth)
       .attr('height', lineDiv.clientHeight);
 
+    // Render the word cloud.
+    Object(__WEBPACK_IMPORTED_MODULE_1__wordcloud__["a" /* default */])(svgWordcloud, word_count);   
+
     // Render the scatter plot.
-    scatterPlot(svgLine, {
-      data,
-      xValue,
-      xLabel,
-      yValue,
-      yLabel,
-      colorValue,
-      colorLabel,
-      margin
-    });
+    for (let word in selectedWords) {
+      const years = [];
+      const obj = keywords[selectedWords[word]];
+      
+      for (var year in obj.years) {
+        years.push({
+          year: year,
+          freq: obj['years'][year]  
+        });
+      }
+      // TODO: Seperate graph from lines.
+      // Add .remove() so it can be resized etc.
+      Object(__WEBPACK_IMPORTED_MODULE_2__line__["a" /* default */])(svgLine, {
+        years,
+        margin
+      }); 
+    }
+  }
+
+  /**
+   * Switches from one genre to another.
+   * @param {str} genre - to switch to.
+   */
+  function switchGenre(genre) {
+    // Must reset as not all genre have all words.
+    selectedWords.length = 0; // empty array w/o res-assign.
+    render(getData(genre));
+  }
+
+  /**
+   * Adds event handles to check-boxes.
+   */
+  function initGenreCheckboxes() {
+    const genres = [
+      "all",
+      "romance",
+      "sci-fi",
+      "horror",
+      "crime",
+      "drama",
+      "fantasy",
+      "adventure",
+      "action",
+      "comedy",
+      "thriller"
+    ];
+    genres.forEach(
+        g => {
+          document
+              .getElementById(g)
+              .onchange = () => switchGenre(g)
+        }
+    );  
   }
 
   // Draw for the first time to initialize.
-  render();
+  render(getData('all'));
+  initGenreCheckboxes();
 
   // Redraw based on the new size whenever the browser window is resized.
-  window.addEventListener('resize', render);
-});
-*/
+  // window.addEventListener('resize', () => render(data));
 
-/* Drawing wordcloud */
-const wordcloud = d3.select('#wordcloud');
-const wordcloudDiv = wordcloud.node();
-const svgWordcloud = wordcloud.select('svg');
+// Closing keywords and genre.
+});});
 
-Object(__WEBPACK_IMPORTED_MODULE_1__wordcloud__["a" /* default */])(svgWordcloud);
 
-/* Drawing linechart */
-
-const keyword = "love";
-const margin = { left: 50, right: 20, top: 20, bottom: 50 };
-
-const lineId = d3.select('#line');
-const lineDiv = lineId.node();
-const svgLine = lineId.select('svg');
-
-d3.json('data/keywords.json', data => {
-
-  var years = [];
-  var obj = data[keyword];
-  for (var year in obj.years) {
-    years.push({
-      year: year,
-      freq: obj['years'][year]  
-    });
-  }
-
-  const render = () => {
-
-    // Extract the width and height that was computed by CSS.
-    svgLine
-      .attr('width', lineDiv.clientWidth)
-      .attr('height', lineDiv.clientHeight);
-
-    // Render the scatter plot.
-    Object(__WEBPACK_IMPORTED_MODULE_2__line__["a" /* default */])(svgLine, {
-      years,
-      margin
-    });
-  }
-
-  // Draw for the first time to initialize.
-  render();
-
-  // Redraw based on the new size whenever the browser window is resized.
-  //window.addEventListener('resize', render);
-});
 
 /***/ }),
 /* 1 */
@@ -300,30 +330,18 @@ const colorLegend = d3.legendColor()
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__d3_layout_cloud___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__d3_layout_cloud__);
 
 
-/* harmony default export */ __webpack_exports__["a"] = (function (svg_location, props){
-    d3.json("data/keywords.json", data => {
-        var word_count = []; 
-        for (var word in data) {
-          word_count.push({
-            key: word,
-            value: data[word]['total_count']
-          });
-        }
-          
-        var chart = renderChart()
-          .svgHeight(400)
-          .container('#wordcloud')
-          .data({ values: word_count })
-          .responsive(true)
-          .run()
-      })
-         
-      
-      
-      /*  
+/* harmony default export */ __webpack_exports__["a"] = (function (svg_location, word_count, props){
+
+    var chart = renderChart()
+        .svgHeight(400)
+        .container('#wordcloud')
+        .data({ values: word_count })
+        .responsive(true)
+        .run();
+     
+  /*  
   
   This code is based on following convention:
-  
   https://github.com/bumbeishvili/d3-coding-conventions
   
   */
@@ -1028,15 +1046,11 @@ const colorLegend = d3.legendColor()
     console.log('in line!');
     const { 
         years,
-        xValue,
-        xLabel,
-        yValue,
-        yLabel,
         margin
       } = props;
 
     const data = years;
-    const  svg = d3.select("#lineSVG");
+    const svg = d3.select("#lineSVG");
     const width = svg.attr('width');
     const height = svg.attr('height');
     const innerWidth = width - margin.left - margin.right;
@@ -1049,20 +1063,35 @@ const colorLegend = d3.legendColor()
     .x(function(d) { return x(d.year); })
     .y(function(d) { return y(d.freq); });
     
+    const xLabel = d => d.year; 
+    const yLabel = d => d.freq;
     
     const g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    const xAxisGEnter = g.append('g').attr('class', 'x-axis');
+    const xAxisG = xAxisGEnter
+      .merge(g.select('.x-axis'))
+        .attr('transform', `translate(0, ${innerHeight})`);
+  
 
     renderChart(data);
 
     function renderChart(data) {
         x.domain(d3.extent(data, function(d) { return d.year; }));
         y.domain(d3.extent(data, function(d) { return d.freq; }));
-      
-        g.append("g")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x))
-          .select(".domain")
-            .remove();
+/*
+        xAxisGEnter
+        .append('text')
+            .attr('class', 'axis-label')
+            .attr('y', 100)
+        .merge(xAxisG.select('.axis-label'))
+            .attr('x', innerWidth / 2)
+            .text(xLabel);
+       */
+      g.append('g')
+                 .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x))
+              .select(".domain")
+                .remove();
       
         g.append("g")
             .call(d3.axisLeft(y))
