@@ -1,5 +1,5 @@
 {
-  "Romance": {
+  "romance": {
     "count": 1107, 
     "keywords": {
       "best friend": {
@@ -1044,7 +1044,7 @@
       }
     }
   }, 
-  "Sci-Fi": {
+  "sci-fi": {
     "count": 616, 
     "keywords": {
       "planet": {
@@ -2089,7 +2089,7 @@
       }
     }
   }, 
-  "Horror": {
+  "horror": {
     "count": 565, 
     "keywords": {
       "ghost": {
@@ -3134,7 +3134,7 @@
       }
     }
   }, 
-  "Crime": {
+  "crime": {
     "count": 889, 
     "keywords": {
       "detective": {
@@ -4179,7 +4179,7 @@
       }
     }
   }, 
-  "Drama": {
+  "drama": {
     "count": 2594, 
     "keywords": {
       "boy": {
@@ -5224,7 +5224,7 @@
       }
     }
   }, 
-  "Fantasy": {
+  "fantasy": {
     "count": 610, 
     "keywords": {
       "ghost": {
@@ -6269,7 +6269,7 @@
       }
     }
   }, 
-  "Adventure": {
+  "adventure": {
     "count": 923, 
     "keywords": {
       "king": {
@@ -7314,7 +7314,7 @@
       }
     }
   }, 
-  "Action": {
+  "action": {
     "count": 1153, 
     "keywords": {
       "cia": {
@@ -8359,7 +8359,7 @@
       }
     }
   }, 
-  "Comedy": {
+  "comedy": {
     "count": 1872, 
     "keywords": {
       "school": {
@@ -9404,7 +9404,7 @@
       }
     }
   }, 
-  "Thriller": {
+  "thriller": {
     "count": 1411, 
     "keywords": {
       "detective": {

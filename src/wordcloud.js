@@ -1,29 +1,17 @@
 import * as cloud from './d3.layout.cloud'
 
-export default function (svg_location, props){
-    d3.json("data/keywords.json", data => {
-        var word_count = []; 
-        for (var word in data) {
-          word_count.push({
-            key: word,
-            value: data[word]['total_count']
-          });
-        }
-          
-        var chart = renderChart()
-          .svgHeight(400)
-          .container('#wordcloud')
-          .data({ values: word_count })
-          .responsive(true)
-          .run()
-      })
-         
-      
-      
-      /*  
+export default function (svg_location, word_count, props){
+
+    var chart = renderChart()
+        .svgHeight(400)
+        .container('#wordcloud')
+        .data({ values: word_count })
+        .responsive(true)
+        .run();
+     
+  /*  
   
   This code is based on following convention:
-  
   https://github.com/bumbeishvili/d3-coding-conventions
   
   */

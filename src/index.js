@@ -1,101 +1,130 @@
 import scatterPlot from './scatterPlot'
 import wordCloud from './wordcloud'
 import line from './line'
-/*
-const xValue = d => d.sepalLength;
-const xLabel = 'Sepal Length';
-const yValue = d => d.petalLength;
-const yLabel = 'Petal Length';
-const colorValue = d => d.species;
-const colorLabel = 'Species';
-const margin = { left: 120, right: 300, top: 20, bottom: 120 };
 
-const line = d3.select('#line');
-const lineDiv = line.node();
-const svgLine = line.select('svg');
 
-const row = d => {
-  d.petalLength = +d.petalLength;
-  d.petalWidth = +d.petalWidth;
-  d.sepalLength = +d.sepalLength;
-  d.sepalWidth = +d.sepalWidth;
-  return d;
-};
+d3.json('data/keywords.json', _keywords => {
+d3.json('data/genres.json', _genres => {
 
-d3.csv('data/iris.csv', row, data => {
+  /**
+   * Fetches the *correct* data given a genre.
+   * @param {str} genre - subset of data to fetch.
+   */
+  const getData = (genre) => {
+    var word_count = []; 
+    if (genre == "all") {
+      for (var word in _keywords) {
+        word_count.push({
+          key: word,
+          value: _keywords[word]['total_count']
+        });
+      }
+      return {
+        keywords: _keywords,
+        word_count: word_count
+      }
+    }
+    const data = _genres[genre];    
+    const keywords = data['keywords'];
+    for (var word in keywords) {
+      word_count.push({
+        key: word,
+        value: keywords[word]['count']
+      });
+    }
+    return {
+      keywords: keywords,
+      word_count: word_count
+    }
+  }
 
-  const render = () => {
+  /* Drawing wordcloud */
+  const wordcloud = d3.select('#wordcloud');
+  const wordcloudDiv = wordcloud.node();
+  const svgWordcloud = wordcloud.select('svg');
+
+  /* Drawing linechart */
+  const selectedWords = ["love"];
+  const margin = { left: 50, right: 20, top: 20, bottom: 50 };
+  const lineId = d3.select('#line');
+  const lineDiv = lineId.node();
+  const svgLine = lineId.select('svg');
+
+  /* Render function */
+  const render = (_data) => {
+    const {keywords, word_count} = _data;
 
     // Extract the width and height that was computed by CSS.
     svgLine
       .attr('width', lineDiv.clientWidth)
       .attr('height', lineDiv.clientHeight);
 
+    // Render the word cloud.
+    wordCloud(svgWordcloud, word_count);   
+
     // Render the scatter plot.
-    scatterPlot(svgLine, {
-      data,
-      xValue,
-      xLabel,
-      yValue,
-      yLabel,
-      colorValue,
-      colorLabel,
-      margin
-    });
+    for (let word in selectedWords) {
+      const years = [];
+      const obj = keywords[selectedWords[word]];
+      
+      for (var year in obj.years) {
+        years.push({
+          year: year,
+          freq: obj['years'][year]  
+        });
+      }
+      // TODO: Seperate graph from lines.
+      // Add .remove() so it can be resized etc.
+      line(svgLine, {
+        years,
+        margin
+      }); 
+    }
+  }
+
+  /**
+   * Switches from one genre to another.
+   * @param {str} genre - to switch to.
+   */
+  function switchGenre(genre) {
+    // Must reset as not all genre have all words.
+    selectedWords.length = 0; // empty array w/o res-assign.
+    render(getData(genre));
+  }
+
+  /**
+   * Adds event handles to check-boxes.
+   */
+  function initGenreCheckboxes() {
+    const genres = [
+      "all",
+      "romance",
+      "sci-fi",
+      "horror",
+      "crime",
+      "drama",
+      "fantasy",
+      "adventure",
+      "action",
+      "comedy",
+      "thriller"
+    ];
+    genres.forEach(
+        g => {
+          document
+              .getElementById(g)
+              .onchange = () => switchGenre(g)
+        }
+    );  
   }
 
   // Draw for the first time to initialize.
-  render();
+  render(getData('all'));
+  initGenreCheckboxes();
 
   // Redraw based on the new size whenever the browser window is resized.
-  window.addEventListener('resize', render);
-});
-*/
+  // window.addEventListener('resize', () => render(data));
 
-/* Drawing wordcloud */
-const wordcloud = d3.select('#wordcloud');
-const wordcloudDiv = wordcloud.node();
-const svgWordcloud = wordcloud.select('svg');
+// Closing keywords and genre.
+});});
 
-wordCloud(svgWordcloud);
-
-/* Drawing linechart */
-
-const keyword = "love";
-const margin = { left: 50, right: 20, top: 20, bottom: 50 };
-
-const lineId = d3.select('#line');
-const lineDiv = lineId.node();
-const svgLine = lineId.select('svg');
-
-d3.json('data/keywords.json', data => {
-
-  var years = [];
-  var obj = data[keyword];
-  for (var year in obj.years) {
-    years.push({
-      year: year,
-      freq: obj['years'][year]  
-    });
-  }
-
-  const render = () => {
-
-    // Extract the width and height that was computed by CSS.
-    svgLine
-      .attr('width', lineDiv.clientWidth)
-      .attr('height', lineDiv.clientHeight);
-
-    // Render the scatter plot.
-    line(svgLine, {
-      years,
-      margin
-    });
-  }
-
-  // Draw for the first time to initialize.
-  render();
-
-  // Redraw based on the new size whenever the browser window is resized.
-  //window.addEventListener('resize', render);
-});

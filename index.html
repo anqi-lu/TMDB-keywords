@@ -14,8 +14,66 @@
     <div id="visualization">
       <div class="left">
         <div class="title"><h1>Most Common Plot Keywords</h1></div>
-        <div class="wordcloud" id="wordcloud">
-        </div>
+        <div class="wordcloud" id="wordcloud"/>
+      </div>  
+
+        <fieldset>
+            <legend>Select a genre (or all of them).</legend>
+            <table>
+                <tr>
+                    <td>
+                      <input type="radio" id="all" name="genre" value="all" checked>
+                      <label for="all">All genres</label> 
+                    </td> 
+                </tr>
+                <tr>
+                  <td>
+                    <input type="radio" id="romance" name="genre" value="genre" onmo>
+                    <label for="coding">Romance</label>
+                  </td>
+                  <td>
+                    <input type="radio" id="sci-fi" name="genre" value="sci-fi">
+                    <label for="sci-fi">Sci-Fi</label>
+                  </td>
+                  <td>
+                    <input type="radio" id="horror" name="genre" value="horror">
+                    <label for="horror">Horror</label>
+                  </td>
+                  <td>
+                    <input type="radio" id="crime" name="genre" value="crime">
+                    <label for="crime">Crime</label>
+                  </td>
+                  <td>
+                    <input type="radio" id="drama" name="genre" value="drama">
+                    <label for="drama">Drama</label>
+                  </td>
+                </tr>
+                <tr>
+                    <td>
+                      <input type="radio" id="fantasy" name="genre" value="fantasy">
+                      <label for="fantasy">Fantasy</label>
+                    </td>
+                    <td>
+                      <input type="radio" id="adventure" name="genre" value="adventure">
+                      <label for="adventure">Adventure</label>
+                    </td>
+                    <td>
+                      <input type="radio" id="action" name="genre" value="action">
+                      <label for="action">Action</label>
+                    </td>
+                    <td>
+                      <input type="radio" id="comedy" name="genre" value="comedy">
+                      <label for="comedy">Comedy</label>
+                    </td>
+                    <td>
+                      <input type="radio" id="thriller" name="genre" value="thriller">
+                      <label for="thriller">Thriller</label>
+                    </td>
+                  </tr>
+              </table>
+
+          </fieldset>
+
       </div>
       <div class="right">
         <div class="filters"><h2>Filters</h2></div>
