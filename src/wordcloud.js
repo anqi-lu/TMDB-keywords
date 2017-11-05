@@ -17,6 +17,7 @@ export default function (svg_location, word_count, props){
   */
   
   
+
   function renderChart(params) {
   
     // exposed variables
@@ -75,6 +76,8 @@ export default function (svg_location, word_count, props){
   
         scales.color = d3.scaleOrdinal(d3.schemeCategory20b);
   
+        var dispatch = d3.dispatch('wordClick');
+        
   
         //######################  LAYOUTS  #################
         var layouts = {};
@@ -85,6 +88,7 @@ export default function (svg_location, word_count, props){
           .fontSize(function (d) {
             return scales.fontSize(+d.value);
           })
+          
           .text(function (d) {
             return d.key;
           })
@@ -100,6 +104,11 @@ export default function (svg_location, word_count, props){
               calc.chartHeight / Math.abs(bounds[1].y - calc.centerY),
               calc.chartHeight / Math.abs(bounds[0].y - calc.centerY)) / 2 : 1;
   
+            dispatch.on('wordClick', function(d){
+              console.log(d);
+              //TODO
+            });
+
             var texts = patternify({ container: centerPoint, selector: 'texts', elementTag: 'text', data: attrs.data.values })
   
             texts.attr("text-anchor", "middle")
@@ -113,10 +122,12 @@ export default function (svg_location, word_count, props){
               .text(function (d) {
                 return d.text;
               })
+              .on('click', function(d){ dispatch.call('wordClick', this, d.text) })
               .style("fill", function (d) {
                 return scales.color(d.text.toLowerCase());
               })
   
+           
             texts.transition()
               .duration(1000)
               .attr("transform", function (d) {

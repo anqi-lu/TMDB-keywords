@@ -1,6 +1,5 @@
 
 export default function (svg_location, props) {
-    console.log('in line!');
     const { 
         years,
         margin
@@ -35,20 +34,12 @@ export default function (svg_location, props) {
     function renderChart(data) {
         x.domain(d3.extent(data, function(d) { return d.year; }));
         y.domain(d3.extent(data, function(d) { return d.freq; }));
-/*
-        xAxisGEnter
-        .append('text')
-            .attr('class', 'axis-label')
-            .attr('y', 100)
-        .merge(xAxisG.select('.axis-label'))
-            .attr('x', innerWidth / 2)
-            .text(xLabel);
-       */
-      g.append('g')
-                 .attr("transform", "translate(0," + height + ")")
-                .call(d3.axisBottom(x))
-              .select(".domain")
-                .remove();
+
+        g.append('g')
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x))
+            .select(".domain")
+            .remove();
       
         g.append("g")
             .call(d3.axisLeft(y))
