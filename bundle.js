@@ -124,6 +124,25 @@ d3.json('data/genres.json', _genres => {
   const lineDiv = lineId.node();
   const svgLine = lineId.select('svg');
 
+  const updateSelectedWords = function(word) {
+    var index = selectedWords.indexOf(word);
+    if (index > -1) {
+      selectedWords.splice(index, 1);
+    } else {
+      selectedWords.push(word);
+    }
+    console.log(selectedWords);
+  }
+
+  const getWordClass = function(word) {
+    var index = selectedWords.indexOf(word);
+    if (index > -1) {
+      return "texts selected";
+    } else {
+      return "texts unselected";
+    }
+  }
+  
   /* Render function */
   const render = (_data) => {
     const {keywords, word_count} = _data;
@@ -134,7 +153,7 @@ d3.json('data/genres.json', _genres => {
       .attr('height', lineDiv.clientHeight);
 
     // Render the word cloud.
-    Object(__WEBPACK_IMPORTED_MODULE_1__wordcloud__["a" /* default */])(svgWordcloud, word_count);   
+    Object(__WEBPACK_IMPORTED_MODULE_1__wordcloud__["a" /* default */])(svgWordcloud, word_count, updateSelectedWords, getWordClass);   
 
     // Render the scatter plot.
     for (let word in selectedWords) {
@@ -330,7 +349,7 @@ const colorLegend = d3.legendColor()
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__d3_layout_cloud___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__d3_layout_cloud__);
 
 
-/* harmony default export */ __webpack_exports__["a"] = (function (svg_location, word_count, props){
+/* harmony default export */ __webpack_exports__["a"] = (function (svg_location, word_count, updateSelectedWords, getWordClass, props){
 
     var chart = renderChart()
         .svgHeight(400)
@@ -399,7 +418,7 @@ const colorLegend = d3.legendColor()
         //#####################   SCALES  ###################
         var scales = {};
         scales.fontSize = d3.scaleSqrt()
-          .range([10, 100])
+          .range([20, 100])
           .domain(calc.minMax);
   
         scales.color = d3.scaleOrdinal(d3.schemeCategory20b);
@@ -433,13 +452,16 @@ const colorLegend = d3.legendColor()
               calc.chartHeight / Math.abs(bounds[0].y - calc.centerY)) / 2 : 1;
   
             dispatch.on('wordClick', function(d){
-              console.log(d);
-              //TODO
+              updateSelectedWords(d.text);
+              var texts = patternify({ container: centerPoint, selector: 'texts', elementTag: 'text', data: attrs.data.values })
+              texts.attr("class", z => getWordClass(z.text));
             });
+
 
             var texts = patternify({ container: centerPoint, selector: 'texts', elementTag: 'text', data: attrs.data.values })
   
             texts.attr("text-anchor", "middle")
+              .attr("class", d => getWordClass(d.text))
               .attr("transform", function (d) {
                 return "translate(0,0)rotate( 0)";
               })
@@ -450,10 +472,11 @@ const colorLegend = d3.legendColor()
               .text(function (d) {
                 return d.text;
               })
-              .on('click', function(d){ dispatch.call('wordClick', this, d.text) })
-              .style("fill", function (d) {
-                return scales.color(d.text.toLowerCase());
-              })
+              .on('click', d => dispatch.call('wordClick', this, d) )
+
+              // .style("fill", function (d) {
+              //   return scales.color(d.text.toLowerCase());
+              // })
   
            
             texts.transition()

@@ -50,6 +50,25 @@ d3.json('data/genres.json', _genres => {
   const lineDiv = lineId.node();
   const svgLine = lineId.select('svg');
 
+  const updateSelectedWords = function(word) {
+    var index = selectedWords.indexOf(word);
+    if (index > -1) {
+      selectedWords.splice(index, 1);
+    } else {
+      selectedWords.push(word);
+    }
+    console.log(selectedWords);
+  }
+
+  const getWordClass = function(word) {
+    var index = selectedWords.indexOf(word);
+    if (index > -1) {
+      return "texts selected";
+    } else {
+      return "texts unselected";
+    }
+  }
+  
   /* Render function */
   const render = (_data) => {
     const {keywords, word_count} = _data;
@@ -60,7 +79,7 @@ d3.json('data/genres.json', _genres => {
       .attr('height', lineDiv.clientHeight);
 
     // Render the word cloud.
-    wordCloud(svgWordcloud, word_count);   
+    wordCloud(svgWordcloud, word_count, updateSelectedWords, getWordClass);   
 
     // Render the scatter plot.
     for (let word in selectedWords) {

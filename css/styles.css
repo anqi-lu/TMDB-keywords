@@ -56,7 +56,13 @@ body {
   margin-left: 0;
   float: left;
 }
+.selected {
+  fill: steelblue;
+}
 
+.unselected {
+  fill: lightgrey;
+}
 
 input[type="radio"] {
   -webkit-appearance: checkbox; /* Chrome, Safari, Opera */
