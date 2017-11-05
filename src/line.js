@@ -17,7 +17,8 @@ export default function (svg_location, props) {
     .rangeRound([innerHeight, 0]);
     var line = d3.line()
     .x(function(d) { return x(d.year); })
-    .y(function(d) { return y(d.freq); });
+    .y(function(d) { return y(d.freq); })
+    .curve(d3.curveMonotoneX); 
     
     const xLabel = d => d.year; 
     const yLabel = d => d.freq;

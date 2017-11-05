@@ -15,8 +15,6 @@ export default function (svg_location, word_count, props){
   https://github.com/bumbeishvili/d3-coding-conventions
   
   */
-  
-  
 
   function renderChart(params) {
   
