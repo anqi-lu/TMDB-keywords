@@ -347,6 +347,7 @@ const colorLegend = d3.legendColor()
   */
   
   
+
   function renderChart(params) {
   
     // exposed variables
@@ -405,6 +406,8 @@ const colorLegend = d3.legendColor()
   
         scales.color = d3.scaleOrdinal(d3.schemeCategory20b);
   
+        var dispatch = d3.dispatch('wordClick');
+        
   
         //######################  LAYOUTS  #################
         var layouts = {};
@@ -415,6 +418,7 @@ const colorLegend = d3.legendColor()
           .fontSize(function (d) {
             return scales.fontSize(+d.value);
           })
+          
           .text(function (d) {
             return d.key;
           })
@@ -430,6 +434,11 @@ const colorLegend = d3.legendColor()
               calc.chartHeight / Math.abs(bounds[1].y - calc.centerY),
               calc.chartHeight / Math.abs(bounds[0].y - calc.centerY)) / 2 : 1;
   
+            dispatch.on('wordClick', function(d){
+              console.log(d);
+              //TODO
+            });
+
             var texts = patternify({ container: centerPoint, selector: 'texts', elementTag: 'text', data: attrs.data.values })
   
             texts.attr("text-anchor", "middle")
@@ -443,10 +452,12 @@ const colorLegend = d3.legendColor()
               .text(function (d) {
                 return d.text;
               })
+              .on('click', function(d){ dispatch.call('wordClick', this, d.text) })
               .style("fill", function (d) {
                 return scales.color(d.text.toLowerCase());
               })
   
+           
             texts.transition()
               .duration(1000)
               .attr("transform", function (d) {
@@ -1043,7 +1054,6 @@ const colorLegend = d3.legendColor()
 "use strict";
 
 /* harmony default export */ __webpack_exports__["a"] = (function (svg_location, props) {
-    console.log('in line!');
     const { 
         years,
         margin
@@ -1078,20 +1088,12 @@ const colorLegend = d3.legendColor()
     function renderChart(data) {
         x.domain(d3.extent(data, function(d) { return d.year; }));
         y.domain(d3.extent(data, function(d) { return d.freq; }));
-/*
-        xAxisGEnter
-        .append('text')
-            .attr('class', 'axis-label')
-            .attr('y', 100)
-        .merge(xAxisG.select('.axis-label'))
-            .attr('x', innerWidth / 2)
-            .text(xLabel);
-       */
-      g.append('g')
-                 .attr("transform", "translate(0," + height + ")")
-                .call(d3.axisBottom(x))
-              .select(".domain")
-                .remove();
+
+        g.append('g')
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x))
+            .select(".domain")
+            .remove();
       
         g.append("g")
             .call(d3.axisLeft(y))
