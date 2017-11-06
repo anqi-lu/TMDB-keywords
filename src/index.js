@@ -65,16 +65,16 @@ d3.json('data/genres.json', _genres => {
     }
   }
 
-  const textColor = function(word) {
-    const color = d3.scaleOrdinal(d3.schemeCategory20)
-      .domain(selectedWords)
-    return color(word);
-  }
 
   /* Render function */
   const render = (_data) => {
     const {keywords, word_count} = _data;
-    console.log(keywords, word_count)
+    //console.log(keywords, word_count)
+    const textColor = function(word) {
+      const color = d3.scaleOrdinal(d3.schemeCategory20)
+        .domain(Object.keys(keywords))
+      return color(word);
+    }
     const updateSelectedWords = function(word) {
       var index = selectedWords.indexOf(word);
       if (index > -1) {
