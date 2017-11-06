@@ -96,7 +96,7 @@ class LineChart {
             .attr("stroke", d => lineColor(d.word))
             .attr("stroke-linejoin", "round")
             .attr("stroke-linecap", "round")
-            .attr("stroke-width", 1.5)
+            .attr("stroke-width", 2.5)
             .attr("d", d => line(d.data));
 
         lines.enter()   
@@ -106,7 +106,7 @@ class LineChart {
             .attr("stroke", d => lineColor(d.word))
             .attr("stroke-linejoin", "round")
             .attr("stroke-linecap", "round")
-            .attr("stroke-width", 1.5)
+            .attr("stroke-width", 2.5)
             .attr("d", d => line(d.data));
 
         lines.exit().remove();
