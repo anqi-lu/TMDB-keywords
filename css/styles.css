@@ -56,9 +56,9 @@ body {
   margin-left: 0;
   float: left;
 }
-.selected {
+/* .selected {
   fill: steelblue;
-}
+} */
 
 .unselected {
   fill: lightgrey;

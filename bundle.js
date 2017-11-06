@@ -118,21 +118,17 @@ d3.json('data/genres.json', _genres => {
   const svgWordcloud = wordcloud.select('svg');
 
   /* Drawing linechart */
-  const selectedWords = ["love"];
+  const selectedWords = [];
   const margin = { left: 50, right: 20, top: 20, bottom: 50 };
   const lineId = d3.select('#line');
   const lineDiv = lineId.node();
   const svgLine = lineId.select('svg');
 
-  const updateSelectedWords = function(word) {
-    var index = selectedWords.indexOf(word);
-    if (index > -1) {
-      selectedWords.splice(index, 1);
-    } else {
-      selectedWords.push(word);
-    }
-    console.log(selectedWords);
-  }
+  const lineChart = new __WEBPACK_IMPORTED_MODULE_2__line__["a" /* default */]({
+    svgLine,
+    margin
+  }); 
+
 
   const getWordClass = function(word) {
     var index = selectedWords.indexOf(word);
@@ -142,37 +138,50 @@ d3.json('data/genres.json', _genres => {
       return "texts unselected";
     }
   }
-  
+
+  const textColor = function(word) {
+    const color = d3.scaleOrdinal(d3.schemeCategory20)
+      .domain(selectedWords)
+    return color(word);
+  }
+
   /* Render function */
   const render = (_data) => {
     const {keywords, word_count} = _data;
+    console.log(keywords, word_count)
+    const updateSelectedWords = function(word) {
+      var index = selectedWords.indexOf(word);
+      if (index > -1) {
+        selectedWords.splice(index, 1);
+      } else {
+        selectedWords.push(word);
+      }
 
+      const data = selectedWords.map(word => {
+        const years = [];
+        const obj = keywords[word];
+        for (var year in obj.years) {
+          years.push({
+            year: year,
+            freq: obj['years'][year]  
+          });
+        }
+        const datum = {
+          word: word,
+          data: years
+        };
+        return datum;
+      });
+      lineChart.renderChart(data, (word) => textColor(word));
+    }
+    
     // Extract the width and height that was computed by CSS.
     svgLine
       .attr('width', lineDiv.clientWidth)
       .attr('height', lineDiv.clientHeight);
 
     // Render the word cloud.
-    Object(__WEBPACK_IMPORTED_MODULE_1__wordcloud__["a" /* default */])(svgWordcloud, word_count, updateSelectedWords, getWordClass);   
-
-    // Render the scatter plot.
-    for (let word in selectedWords) {
-      const years = [];
-      const obj = keywords[selectedWords[word]];
-      
-      for (var year in obj.years) {
-        years.push({
-          year: year,
-          freq: obj['years'][year]  
-        });
-      }
-      // TODO: Seperate graph from lines.
-      // Add .remove() so it can be resized etc.
-      Object(__WEBPACK_IMPORTED_MODULE_2__line__["a" /* default */])(svgLine, {
-        years,
-        margin
-      }); 
-    }
+    Object(__WEBPACK_IMPORTED_MODULE_1__wordcloud__["a" /* default */])(svgWordcloud, word_count, updateSelectedWords, getWordClass, (word) => textColor(word));   
   }
 
   /**
@@ -181,7 +190,8 @@ d3.json('data/genres.json', _genres => {
    */
   function switchGenre(genre) {
     // Must reset as not all genre have all words.
-    selectedWords.length = 0; // empty array w/o res-assign.
+    selectedWords.length = 0; // empty array w/o re-assign.
+
     render(getData(genre));
   }
 
@@ -212,6 +222,7 @@ d3.json('data/genres.json', _genres => {
   }
 
   // Draw for the first time to initialize.
+  
   render(getData('all'));
   initGenreCheckboxes();
 
@@ -349,7 +360,7 @@ const colorLegend = d3.legendColor()
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__d3_layout_cloud___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__d3_layout_cloud__);
 
 
-/* harmony default export */ __webpack_exports__["a"] = (function (svg_location, word_count, updateSelectedWords, getWordClass, props){
+/* harmony default export */ __webpack_exports__["a"] = (function (svg_location, word_count, updateSelectedWords, getWordClass, textColor, props){
 
     var chart = renderChart()
         .svgHeight(400)
@@ -454,7 +465,12 @@ const colorLegend = d3.legendColor()
             dispatch.on('wordClick', function(d){
               updateSelectedWords(d.text);
               var texts = patternify({ container: centerPoint, selector: 'texts', elementTag: 'text', data: attrs.data.values })
-              texts.attr("class", z => getWordClass(z.text));
+              texts.attr("class", z => getWordClass(z.text))
+                .style("fill", function (d) {
+                if (getWordClass(d.text) == "texts selected"){
+                  return textColor(d.text);
+                }           
+              })
             });
 
 
@@ -469,16 +485,13 @@ const colorLegend = d3.legendColor()
                 return 2 + "px";
               })
               .style("opacity", 1e-6)
+              .style("fill", "lightgrey")
               .text(function (d) {
                 return d.text;
               })
-              .on('click', d => dispatch.call('wordClick', this, d) )
-
-              // .style("fill", function (d) {
-              //   return scales.color(d.text.toLowerCase());
-              // })
-  
-           
+              .on('click', d => dispatch.call('wordClick', this, d) );
+              
+              
             texts.transition()
               .duration(1000)
               .attr("transform", function (d) {
@@ -1073,70 +1086,123 @@ const colorLegend = d3.legendColor()
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+class LineChart {
+    constructor(props) {
+        const {
+            svg_location, 
+            margin
+        } = props;
 
-/* harmony default export */ __webpack_exports__["a"] = (function (svg_location, props) {
-    const { 
-        years,
-        margin
-      } = props;
+        const svg = d3.select("#lineSVG");
+        const width = svg.attr('width');
+        const height = svg.attr('height');
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+        
+        const xScale = d3.scaleLinear().rangeRound([0, innerWidth]);
+        const yScale = d3.scaleLinear().rangeRound([innerHeight, 0]);
 
-    const data = years;
-    const svg = d3.select("#lineSVG");
-    const width = svg.attr('width');
-    const height = svg.attr('height');
-    const innerWidth = width - margin.left - margin.right;
-    const innerHeight = height - margin.top - margin.bottom;
-    const x = d3.scaleLinear()
-    .rangeRound([0, width]);
-    const y = d3.scaleLinear()
-    .rangeRound([innerHeight, 0]);
-    var line = d3.line()
-    .x(function(d) { return x(d.year); })
-    .y(function(d) { return y(d.freq); })
-    .curve(d3.curveMonotoneX); 
-    
-    const xLabel = d => d.year; 
-    const yLabel = d => d.freq;
-    
-    const g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    const xAxisGEnter = g.append('g').attr('class', 'x-axis');
-    const xAxisG = xAxisGEnter
-      .merge(g.select('.x-axis'))
-        .attr('transform', `translate(0, ${innerHeight})`);
-  
-
-    renderChart(data);
-
-    function renderChart(data) {
-        x.domain(d3.extent(data, function(d) { return d.year; }));
-        y.domain(d3.extent(data, function(d) { return d.freq; }));
-
-        g.append('g')
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x))
-            .select(".domain")
-            .remove();
+        const xLabel = d => d.year; 
+        const yLabel = d => d.freq;
+        
+        const g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
       
-        g.append("g")
-            .call(d3.axisLeft(y))
+        const xAxisGEnter = g.append('g').attr('id', 'bottom-axis');
+        const xAxisG = xAxisGEnter
+          .merge(g.select('#bottom-axis'))
+            .attr('transform', `translate(0, ${innerHeight})`);    
+      
+        this.yScale = yScale;
+        this.xScale = xScale;
+        this.height = innerHeight;
+        this.width = innerWidth;
+        this.g = g;
+
+        this.g.append('g')
+            .attr("id", "bottom-axis");
+        this.g.append("g")
+            .attr("id", "left-axis");
+
+        xAxisG.append("text")
+            .attr("fill", "#000")
+            .attr("transform", "translate(0," + this.height + ")")
+            .attr("alignment-baseline", "middle")
+            .attr("x", -10)
+            .attr("y", 10)
+            .attr("dy", 0)
+            .attr("text-anchor", "end")
+            .text("Year");
+        
+        this.xAxisG = xAxisG;
+        
+    }
+
+    renderChart(data, lineColor) {
+        const xScale = this.xScale;
+        const yScale = this.yScale;
+
+        // TODO
+        const flattened = data.map(d => d.data).reduce(function(a, b) {
+            return a.concat(b);
+        }, []);
+
+        xScale.domain(d3.extent(flattened, function(d) { return d.year; }));
+        yScale.domain(d3.extent(flattened, function(d) { return d.freq; }));
+
+        const line = d3.line()
+            .x(function(d) { return xScale(d.year); })
+            .y(function(d) { return yScale(d.freq); })
+            .curve(d3.curveMonotoneX);
+    
+        this.xAxisG.call(d3.axisBottom(xScale)
+                .tickFormat(d3.format("d")));
+
+        this.xAxisG.selectAll(".tick text")
+            .attr("transform", "rotate(-45)")
+            .attr("x", 0)
+            .attr("y", 20)
+            .attr("dy", 0)
+            .attr("text-anchor", "end");
+
+        d3.select("#left-axis")
+            .call(d3.axisLeft(yScale))
           .append("text")
             .attr("fill", "#000")
+            .attr("transform", "translate(0," + this.width + ")")
             .attr("transform", "rotate(-90)")
             .attr("y", 6)
             .attr("dy", "0.71em")
             .attr("text-anchor", "end")
             .text("Frequency");
-      
-        g.append("path")
-            .datum(data)
+
+        const lines = this.g.selectAll(".lines")
+            .data(data);
+        const label = this.g.selectAll("#left-axis text")
+        // update
+        lines.attr("class", "lines")
             .attr("fill", "none")
-            .attr("stroke", "steelblue")
+            .attr("stroke", d => lineColor(d.word))
             .attr("stroke-linejoin", "round")
             .attr("stroke-linecap", "round")
             .attr("stroke-width", 1.5)
-            .attr("d", line);
+            .attr("d", d => line(d.data));
+
+        lines.enter()   
+            .append("path")
+            .attr("class", "lines")
+            .attr("fill", "none")
+            .attr("stroke", d => lineColor(d.word))
+            .attr("stroke-linejoin", "round")
+            .attr("stroke-linecap", "round")
+            .attr("stroke-width", 1.5)
+            .attr("d", d => line(d.data));
+
+        lines.exit().remove();
+        label.exit().remove();
     }
-});
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (LineChart);
 
 /***/ })
 /******/ ]);

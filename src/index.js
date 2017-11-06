@@ -1,6 +1,6 @@
 import scatterPlot from './scatterPlot'
 import wordCloud from './wordcloud'
-import line from './line'
+import LineChart from './line'
 
 
 d3.json('data/keywords.json', _keywords => {
@@ -44,21 +44,17 @@ d3.json('data/genres.json', _genres => {
   const svgWordcloud = wordcloud.select('svg');
 
   /* Drawing linechart */
-  const selectedWords = ["love"];
+  const selectedWords = [];
   const margin = { left: 50, right: 20, top: 20, bottom: 50 };
   const lineId = d3.select('#line');
   const lineDiv = lineId.node();
   const svgLine = lineId.select('svg');
 
-  const updateSelectedWords = function(word) {
-    var index = selectedWords.indexOf(word);
-    if (index > -1) {
-      selectedWords.splice(index, 1);
-    } else {
-      selectedWords.push(word);
-    }
-    console.log(selectedWords);
-  }
+  const lineChart = new LineChart({
+    svgLine,
+    margin
+  }); 
+
 
   const getWordClass = function(word) {
     var index = selectedWords.indexOf(word);
@@ -68,37 +64,50 @@ d3.json('data/genres.json', _genres => {
       return "texts unselected";
     }
   }
-  
+
+  const textColor = function(word) {
+    const color = d3.scaleOrdinal(d3.schemeCategory20)
+      .domain(selectedWords)
+    return color(word);
+  }
+
   /* Render function */
   const render = (_data) => {
     const {keywords, word_count} = _data;
+    console.log(keywords, word_count)
+    const updateSelectedWords = function(word) {
+      var index = selectedWords.indexOf(word);
+      if (index > -1) {
+        selectedWords.splice(index, 1);
+      } else {
+        selectedWords.push(word);
+      }
 
+      const data = selectedWords.map(word => {
+        const years = [];
+        const obj = keywords[word];
+        for (var year in obj.years) {
+          years.push({
+            year: year,
+            freq: obj['years'][year]  
+          });
+        }
+        const datum = {
+          word: word,
+          data: years
+        };
+        return datum;
+      });
+      lineChart.renderChart(data, (word) => textColor(word));
+    }
+    
     // Extract the width and height that was computed by CSS.
     svgLine
       .attr('width', lineDiv.clientWidth)
       .attr('height', lineDiv.clientHeight);
 
     // Render the word cloud.
-    wordCloud(svgWordcloud, word_count, updateSelectedWords, getWordClass);   
-
-    // Render the scatter plot.
-    for (let word in selectedWords) {
-      const years = [];
-      const obj = keywords[selectedWords[word]];
-      
-      for (var year in obj.years) {
-        years.push({
-          year: year,
-          freq: obj['years'][year]  
-        });
-      }
-      // TODO: Seperate graph from lines.
-      // Add .remove() so it can be resized etc.
-      line(svgLine, {
-        years,
-        margin
-      }); 
-    }
+    wordCloud(svgWordcloud, word_count, updateSelectedWords, getWordClass, (word) => textColor(word));   
   }
 
   /**
@@ -107,7 +116,8 @@ d3.json('data/genres.json', _genres => {
    */
   function switchGenre(genre) {
     // Must reset as not all genre have all words.
-    selectedWords.length = 0; // empty array w/o res-assign.
+    selectedWords.length = 0; // empty array w/o re-assign.
+
     render(getData(genre));
   }
 
@@ -138,6 +148,7 @@ d3.json('data/genres.json', _genres => {
   }
 
   // Draw for the first time to initialize.
+  
   render(getData('all'));
   initGenreCheckboxes();
 

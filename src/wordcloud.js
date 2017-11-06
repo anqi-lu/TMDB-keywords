@@ -1,6 +1,6 @@
 import * as cloud from './d3.layout.cloud'
 
-export default function (svg_location, word_count, updateSelectedWords, getWordClass, props){
+export default function (svg_location, word_count, updateSelectedWords, getWordClass, textColor, props){
 
     var chart = renderChart()
         .svgHeight(400)
@@ -105,7 +105,12 @@ export default function (svg_location, word_count, updateSelectedWords, getWordC
             dispatch.on('wordClick', function(d){
               updateSelectedWords(d.text);
               var texts = patternify({ container: centerPoint, selector: 'texts', elementTag: 'text', data: attrs.data.values })
-              texts.attr("class", z => getWordClass(z.text));
+              texts.attr("class", z => getWordClass(z.text))
+                .style("fill", function (d) {
+                if (getWordClass(d.text) == "texts selected"){
+                  return textColor(d.text);
+                }           
+              })
             });
 
 
@@ -120,16 +125,13 @@ export default function (svg_location, word_count, updateSelectedWords, getWordC
                 return 2 + "px";
               })
               .style("opacity", 1e-6)
+              .style("fill", "lightgrey")
               .text(function (d) {
                 return d.text;
               })
-              .on('click', d => dispatch.call('wordClick', this, d) )
-
-              // .style("fill", function (d) {
-              //   return scales.color(d.text.toLowerCase());
-              // })
-  
-           
+              .on('click', d => dispatch.call('wordClick', this, d) );
+              
+              
             texts.transition()
               .duration(1000)
               .attr("transform", function (d) {
