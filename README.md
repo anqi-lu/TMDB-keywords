@@ -55,6 +55,10 @@ This sketch brings the additional tasks:
   * Zoom by brushing
      * user can select a smaller time period and the line chart zooms into the selected time period
 
+<img width="720" alt="tooltip" src="https://user-images.githubusercontent.com/11758570/32587464-807a30dc-c4d6-11e7-93d2-3ae00e24c0b1.png">
+
+* On the line chart, hover over the year shows a tooltip with the frequency of the selected words at the year being hovered over. 
+
 ## Attribution
 
 This D3.js web project is forked from [curran](https://github.com/curran)'s [this template project](https://github.com/curran/dataviz-project-template).
