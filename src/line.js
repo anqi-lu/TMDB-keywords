@@ -26,6 +26,16 @@ class LineChart {
         
         // tooltip
         const focus = svg.append("g").attr("class", "focus").style("display", "none");
+           // tool tips
+        const mouseG = g.append("g")
+            .attr("class", "mouse-over-effects");
+
+        mouseG.append("path") // this is the black vertical line to follow mouse
+        .attr("class", "mouse-line")
+        .style("stroke", "black")
+        .style("stroke-width", "1px")
+        .style("opacity", "0");
+        
       
         this.bisectYear = d3.bisector(xLabel).left; 
         this.yScale = yScale;
@@ -39,6 +49,7 @@ class LineChart {
         this.marginTop = margin.top;
         this.svg = svg;
         this.g = g;
+        this.mouseG = mouseG;
 
         this.g.append('g')
             .attr("id", "bottom-axis");
@@ -69,6 +80,7 @@ class LineChart {
         const height = this.height;
         const innerWidth = this.innerWidth;
         const innerHeight = this.innerHeight;
+        const mouseG = this.mouseG;
 
         // TODO
         const flattened = data.map(d => d.data).reduce(function(a, b) {
@@ -109,17 +121,11 @@ class LineChart {
 
         const label = this.g.selectAll("#left-axis text")
 
-        // update
-        lines.attr("class", "lines")
-            .attr("fill", "none")
-            .attr("stroke", d => lineColor(d.word))
-            .attr("stroke-linejoin", "round")
-            .attr("stroke-linecap", "round")
-            .attr("stroke-width", 2.5)
-            .attr("d", d => line(d.data));
-
+        lines.exit().remove();
+        
         lines.enter()   
             .append("path")
+            .merge(lines)
             .attr("class", "lines")
             .attr("fill", "none")
             .attr("stroke", d => lineColor(d.word))
@@ -128,44 +134,35 @@ class LineChart {
             .attr("stroke-width", 2.5)
             .attr("d", d => line(d.data));
 
-        lines.exit().remove();
         label.exit().remove();
        
-        // tool tips
-        var mouseG = g.append("g")
-        .attr("class", "mouse-over-effects");
-  
-      mouseG.append("path") // this is the black vertical line to follow mouse
-        .attr("class", "mouse-line")
-        .style("stroke", "black")
-        .style("stroke-width", "1px")
-        .style("opacity", "0");
-        
+     
       var linesElm = document.getElementsByClassName('lines');
 
       var mousePerLine = mouseG.selectAll('.mouse-per-line')
         .data(data)
-        .enter()
+        .enter() 
         .append("g")
         .attr("class", "mouse-per-line");
-  
-      mousePerLine.append("circle")
-        .attr("r", 7)
-        .attr("stroke", function(d){
-            console.log(lineColor(d.word));
-            return lineColor(d.word);
-        })
-        .style("fill", "none")
-        .style("stroke-width", "1px")
-        .style("opacity", "0");
-  
+
+      mousePerLine.exit().remove();
+      mousePerLine.selectAll("circle").exit().remove();
+      mousePerLine.selectAll("text").exit().remove();
+
+      mousePerLine
+        .append("circle")
+            .attr("r", 7)
+            .style("fill", "none")
+            .style("stroke-width", "1px")
+            .style("opacity", "0")
+            .attr("stroke", d =>lineColor(d.word));
+
       mousePerLine.append("text")
         .attr("transform", "translate(10,3)");
-  
+        
       mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
         .attr('width', width) // can't catch mouse events on a g element
         .attr('height', height)
-       // .attr("transform", "translate(" + this.marginLeft + "," + this.marginTop + ")")
         .attr('fill', 'none')
         .attr('pointer-events', 'all')
         .on('mouseout', function() { // on mouse out hide line, circles and text
@@ -193,9 +190,12 @@ class LineChart {
               d += " " + mouse[0] + "," + 0;
               return d;
             });
-  
-          d3.selectAll(".mouse-per-line")
+          const items = d3.selectAll(".mouse-per-line").data(data);
+          items.exit().remove();
+          items
             .attr("transform", function(d, i) {
+                //console.log(d);
+                //return;
               var xDate = xScale.invert(mouse[0]),
                   bisect = d3.bisector(d=>d.year).left,
                   idx = bisect(d, xDate);
@@ -203,6 +203,7 @@ class LineChart {
               var beginning = 0,
                   end = linesElm[i].getTotalLength(),
                   target = null;
+            
                   
               while (true){
                 target = Math.floor((beginning + end) / 2);
@@ -219,9 +220,9 @@ class LineChart {
                 .text(yScale.invert(pos.y).toFixed(2));
                 
               return "translate(" + mouse[0] + "," + pos.y +")";
-            //return "translate(" + mouse[0] + "," + 0 +")";
             });
         });
+        
     }
 }
 
