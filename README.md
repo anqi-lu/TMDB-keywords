@@ -28,9 +28,32 @@ Source of Inspiration:
 [stream-graph explorer](https://unhcr.github.io/dataviz-streamgraph-explorer/ #types=1-2-3-4-5-6-7)
 
 Additional tasks:
+
 4. Select multiple keywords and assign different color for each line in the line chart 
 5. Hover to select a year and corresponding tooltip
 6. Zoom by brushing on the year
+
+## Interactions
+
+<img width="400" alt="wordcloud" src="https://user-images.githubusercontent.com/11758570/32587217-2054e3d8-c4d5-11e7-9e01-d14d12745019.png">
+
+* Word cloud on the left
+  * Bigger the size, more frequent the word appeared
+  * Click on a word, draws a line on the line chart on the right
+  
+<img width="400" alt="genre" src="https://user-images.githubusercontent.com/11758570/32587232-3f50ee62-c4d5-11e7-84bd-42a51dd412d7.png">
+
+* Checkboxes — filter for genre below word cloud
+    * Only one can be selected
+    * Word cloud updated to the top 10 keywords from the selected genre
+
+<img width="1000" alt="screen shot 2017-11-06 at 8 26 05 pm" src="https://user-images.githubusercontent.com/11758570/32587271-776e2bd4-c4d5-11e7-95c4-bf4b41954952.png">
+
+* Line Chart on the right
+  * x-axis: year, y-axis: frequency
+  * Can draw multiple lines with multiple words selected
+  * Zoom by brushing
+     * user can select a smaller time period and the line chart zooms into the selected time period
 
 ## Attribution
 
