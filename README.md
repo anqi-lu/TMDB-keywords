@@ -9,7 +9,7 @@ The TMDB 5000 Movie Dataset contains information for about 5000 movies from The 
 
 ## Prototyping
 
-The first visualization I made was a [donut chart](https://bl.ocks.org/anqi-lu/01dfba5176131dffa961b923047c9fd2), illustrating the number of movies by country.  It shows the which countries are the movies from. Because TMDB is built entirely by the user so there could be a lot of bias in the data (Most movies are from western countries). Therefore, I decided that I was not going to do much with the “country” attribute of the data. Instead, I decided to focus on the “plot_keywords”, “genres”, and “year”.
+The first visualization I made on this dataset was a [donut chart](https://bl.ocks.org/anqi-lu/01dfba5176131dffa961b923047c9fd2), illustrating the number of movies by country.  It shows the which countries are the movies from. Because TMDB is built entirely by the user so there could be a lot of bias in the data (Most movies are from western countries). Therefore, I decided that I was not going to do much with the “country” attribute of the data. Instead, I decided to focus on the “plot_keywords”, “genres”, and “year”.
 
 The questions about this dataset became: 
 - What plot keywords are the most common among all the movies?
