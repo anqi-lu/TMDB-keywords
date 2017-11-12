@@ -1134,6 +1134,12 @@ class LineChart {
             .extent([[0, 0], [innerWidth, innerHeight2]])
             .on("brush end", this.brushed);
 
+        const zoom = d3.zoom()
+            .scaleExtent([1, Infinity])
+            .translateExtent([[0, 0], [innerWidth, innerHeight]])
+            .extent([[0, 0], [innerWidth, innerHeight]])
+            .on("zoom", this.zoomed);
+
         mouseG.append("path") // this is the black vertical line to follow mouse
         .attr("class", "mouse-line")
         .style("stroke", "black")
@@ -1159,6 +1165,7 @@ class LineChart {
         this.margin = margin;
         this.context = context;
         this.brush = brush;
+        this.zoom = zoom;
 
         this.svg = svg;
         this.g = g;

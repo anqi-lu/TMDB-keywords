@@ -61,6 +61,12 @@ body {
   fill: lightgrey;
 }
 
+.zoom {
+  cursor: move;
+  fill: none;
+  pointer-events: all;
+}
+
 input[type="radio"] {
   -webkit-appearance: checkbox; /* Chrome, Safari, Opera */
   -moz-appearance: checkbox;    /* Firefox */
