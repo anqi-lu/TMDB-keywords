@@ -45,7 +45,7 @@ d3.json('data/genres.json', _genres => {
 
   /* Drawing linechart */
   const selectedWords = [];
-  const margin = { left: 50, right: 20, top: 20, bottom: 50 };
+  const margin = { left: 50, right: 20, top: 20, bottom: 200, top2: 470, bottom2: 30};
   const lineId = d3.select('#line');
   const lineDiv = lineId.node();
   const svgLine = lineId.select('svg');

@@ -50,15 +50,12 @@ body {
 .left {
   width: 40%;
   margin-left: 50px;
-  margin-right: 50px;
+  margin-right: 30px;
 }
 .wordcloud svg {
   margin-left: 0;
   float: left;
 }
-/* .selected {
-  fill: steelblue;
-} */
 
 .unselected {
   fill: lightgrey;
