@@ -56,7 +56,7 @@ class LineChart {
                 .attr("stroke-width", 2.5)
                 .attr("d", d => line(d.data));
         
-            g.select(".axis--x").call(this.xAxis);
+            g.selectAll(".axis--x").call(this.xAxis);
             svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
                 .scale(innerWidth / (s[1] - s[0]))
                 .translate(-s[0], 0));
@@ -82,8 +82,7 @@ class LineChart {
                 .attr("stroke-width", 2.5)
                 .attr("d", d => line(d.data));
 
-            console.log(this.xScale)
-            g.select(".axis--x").call(this.xAxis);
+           //g.select(".axis--x").call(this.xAxis);
             context.select(".brush").call(brush.move, this.xScale.range().map(t.invertX, t));
           }
 
@@ -189,8 +188,10 @@ class LineChart {
             .y(d => this.yScale2(d.freq))
             .curve(d3.curveMonotoneX);
 
+        g.selectAll(".axis--x").exit().remove();
         g.append("g")
             .attr("class", "axis axis--x")
+            .attr("id", "#focus-axis")
             .attr("transform", "translate(0," + innerHeight + ")")
             .call(this.xAxis.tickFormat(d3.format("d")));
 
