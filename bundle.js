@@ -1134,6 +1134,7 @@ class LineChart {
             var s = d3.event.selection || xScale2.range();
             this.xScale.domain(s.map(this.xScale2.invert, this.xScale2));
 
+            g.selectAll(".axis--x").exit().remove();
             g.selectAll(".lines")
                 .attr("class", "lines")
                 .attr("fill", "none")
@@ -1143,7 +1144,7 @@ class LineChart {
                 .attr("stroke-width", 2.5)
                 .attr("d", d => line(d.data));
         
-            g.select("#bottom-axis").call(xAxis);
+            g.select(".axis--x").call(this.xAxis);
             svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
                 .scale(innerWidth / (s[1] - s[0]))
                 .translate(-s[0], 0));
@@ -1159,6 +1160,7 @@ class LineChart {
             if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return; // ignore zoom-by-brush
             var t = d3.event.transform;
             this.xScale.domain(t.rescaleX(this.xScale2).domain());
+            g.selectAll(".axis--x").exit().remove();
             g.selectAll(".lines2")
                 .attr("class", "lines2")
                 .attr("fill", "none")
@@ -1167,7 +1169,9 @@ class LineChart {
                 .attr("stroke-linecap", "round")
                 .attr("stroke-width", 2.5)
                 .attr("d", d => line(d.data));
-            focus.select(".axis--x").call(this.xAxis);
+
+            console.log(this.xScale)
+            g.select(".axis--x").call(this.xAxis);
             context.select(".brush").call(brush.move, this.xScale.range().map(t.invertX, t));
           }
 
@@ -1342,6 +1346,11 @@ class LineChart {
             .call( brush.move, this.xScale2.range());
 
         var linesElm = document.getElementsByClassName('lines');
+        
+        // Year label
+        mouseG
+            .append("text").attr("class", "focus year")
+            .attr("x", 40).attr("y", 7);
 
         // mouse interactions - hover over show count
         var mousePerLine = mouseG.selectAll('.mouse-per-line')
@@ -1397,13 +1406,6 @@ class LineChart {
             d1 = data[0].data[i],
             d = xDate - d0.year > d1.year - xDate ? d1 : d0;
 
-            const freq = d.freq;
-            
-
-            // focus.attr("transform", "translate(" + xScale(d.year) + "," + yScale(d.freq) + ")");
-            // focus.select("text").text(function() { return d.freq; });
-            // focus.select(".x-hover-line").attr("y2", height - yScale(d.freq));
-            // focus.select(".y-hover-line").attr("x2", width + width);
             const selectedYearX =  xScale(d.year);
             d3.select(".mouse-line")
               .attr("d", function() {
@@ -1413,9 +1415,10 @@ class LineChart {
                 });
 
 
-
+        mouseG.select(".focus.year").text("Year: " + d.year);
         const items = d3.selectAll(".mouse-per-line").data(data);
         items.exit().remove();
+        
         items
             .attr("transform", function(d, i) {
 
@@ -1436,9 +1439,9 @@ class LineChart {
             }
             
             d3.select(this).select('text')
-                .text(freq);
+                .text(yScale.invert(pos.y).toFixed(0))
                 
-            return "translate(" + pos.x + "," + pos.y +")";
+            return "translate(" + pos.x + "," + pos.y  +")";
             });
         });
         
