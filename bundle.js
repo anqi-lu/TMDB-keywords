@@ -1126,8 +1126,8 @@ class LineChart {
 
         const brushed = () => {
             const line = d3.line()
-                .x(d => xScale(d.year))
-                .y(d => yScale(d.freq))
+                .x(d => this.xScale(d.year))
+                .y(d => this.yScale(d.freq))
                 .curve(d3.curveMonotoneX);
 
             if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
@@ -1145,7 +1145,7 @@ class LineChart {
         
             g.select("#bottom-axis").call(xAxis);
             svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
-                .scale(width / (s[1] - s[0]))
+                .scale(innerWidth / (s[1] - s[0]))
                 .translate(-s[0], 0));
         }
 
@@ -1294,11 +1294,6 @@ class LineChart {
             .attr("text-anchor", "end")
             .text("Frequency");
 
-        // axis for overview chart
-        // this.xAxisG2
-        //     .call(this.xAxis2(xScale2)
-        //     .tickFormat(d3.format("d")));
-        
         // draw lines for main chart
         const lines = g.selectAll(".lines")
             .data(data);
@@ -1345,14 +1340,6 @@ class LineChart {
             .call( brush.move, this.xScale2.range());
         brusher.call(brush)
             .call( brush.move, this.xScale2.range());
-        // this.context.append("g")
-        //     .attr("class", "brush")
-        //     .call( brush)
-        //     .call( brush.move, xScale.range());
-
-        // area for zoom
-
-           // .call(zoom(lines));
 
         var linesElm = document.getElementsByClassName('lines');
 
@@ -1379,7 +1366,7 @@ class LineChart {
             .attr("transform", "translate(10,3)");
             
         mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
-            .attr('width', width) // can't catch mouse events on a g element
+            .attr('width', innerWidth) // can't catch mouse events on a g element
             .attr('height', innerHeight)
             .attr('fill', 'none')
             .attr('pointer-events', 'all')
@@ -1402,23 +1389,36 @@ class LineChart {
             .on('mousemove', function() { // mouse moving over canvas
             var mouse = d3.mouse(this);
             var pos;
+
+            var xDate = xScale.invert(mouse[0]),
+            bisect = d3.bisector(d=>d.year).left,
+            i = bisect(data[0].data, xDate),
+            d0 = data[0].data[i-1],
+            d1 = data[0].data[i],
+            d = xDate - d0.year > d1.year - xDate ? d1 : d0;
+
+            const freq = d.freq;
+            
+
+            // focus.attr("transform", "translate(" + xScale(d.year) + "," + yScale(d.freq) + ")");
+            // focus.select("text").text(function() { return d.freq; });
+            // focus.select(".x-hover-line").attr("y2", height - yScale(d.freq));
+            // focus.select(".y-hover-line").attr("x2", width + width);
+            const selectedYearX =  xScale(d.year);
             d3.select(".mouse-line")
-                .attr("d", function() {
-                var d = "M" + mouse[0] + "," + innerHeight;
-                d += " " + mouse[0] + "," + 0;
+              .attr("d", function() {
+                var d = "M" + selectedYearX + "," + innerHeight;
+                d += " " + selectedYearX + "," + 0;
                 return d;
                 });
+
+
 
         const items = d3.selectAll(".mouse-per-line").data(data);
         items.exit().remove();
         items
             .attr("transform", function(d, i) {
-                //console.log(d);
-                //return;
-            var xDate = xScale.invert(mouse[0]),
-                bisect = d3.bisector(d=>d.year).left,
-                idx = bisect(d, xDate);
-                
+
             var beginning = 0,
                 end = linesElm[i].getTotalLength(),
                 target = null;
@@ -1436,9 +1436,9 @@ class LineChart {
             }
             
             d3.select(this).select('text')
-                .text(yScale.invert(pos.y).toFixed(2));
+                .text(freq);
                 
-            return "translate(" + mouse[0] + "," + pos.y +")";
+            return "translate(" + pos.x + "," + pos.y +")";
             });
         });
         
